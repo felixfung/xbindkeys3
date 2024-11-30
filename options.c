@@ -57,9 +57,11 @@ SCM set_numlock_wrapper (SCM x);
 SCM set_scrolllock_wrapper (SCM x);
 SCM set_capslock_wrapper (SCM x);
 SCM xbindkey_wrapper(SCM key, SCM cmd);
+SCM xbind_skippy_wrapper(SCM key, SCM cmd);
 SCM xbindkey_function_wrapper(SCM key, SCM fun);
 SCM remove_xbindkey_wrapper(SCM key);
 SCM run_command_wrapper (SCM command);
+SCM skippy_wrapper (SCM command);
 SCM grab_all_keys_wrapper (void);
 SCM ungrab_all_keys_wrapper (void);
 SCM remove_all_keys_wrapper (void);
@@ -835,9 +837,11 @@ init_xbk_guile_fns (void)
   scm_c_define_gsubr("set-scrolllock!", 1, 0, 0, set_scrolllock_wrapper);
   scm_c_define_gsubr("set-capslock!", 1, 0, 0, set_capslock_wrapper);
   scm_c_define_gsubr("xbindkey", 2, 0, 0, xbindkey_wrapper);
+  scm_c_define_gsubr("xbind-skippy", 2, 0, 0, xbind_skippy_wrapper);
   scm_c_define_gsubr("xbindkey-function", 2, 0, 0, xbindkey_function_wrapper);
   scm_c_define_gsubr("remove-xbindkey", 1, 0, 0, remove_xbindkey_wrapper);
   scm_c_define_gsubr("run-command", 1, 0, 0, run_command_wrapper);
+  scm_c_define_gsubr("skippy-runner", 1, 0, 0, skippy_wrapper);
   scm_c_define_gsubr("grab-all-keys", 0, 0, 0, grab_all_keys_wrapper);
   scm_c_define_gsubr("ungrab-all-keys", 0, 0, 0, ungrab_all_keys_wrapper);
   scm_c_define_gsubr("remove-all-keys", 0, 0, 0, remove_all_keys_wrapper);
@@ -1038,6 +1042,13 @@ SCM xbindkey_wrapper(SCM key, SCM cmd)
   return SCM_UNSPECIFIED;
 }
 
+SCM xbind_skippy_wrapper(SCM key, SCM cmd)
+{
+  SCM returnval = xbindkey_wrapper(key, cmd);
+  if (returnval == SCM_UNSPECIFIED)
+    keys[nb_keys-1].skippy = 1;
+  return returnval;
+}
 
 SCM tab_scm[2];
 
@@ -1111,6 +1122,16 @@ SCM run_command_wrapper (SCM command)
   run_command (cmdstr);
 
   free(cmdstr);
+
+  return SCM_UNSPECIFIED;
+}
+
+SCM skippy_wrapper (SCM command)
+{
+  run_command_wrapper (command);
+  end_it_all (current_display);
+  start (display_name);
+  reload_rc_file ();
 
   return SCM_UNSPECIFIED;
 }

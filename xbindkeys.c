@@ -41,10 +41,8 @@
 
 void end_it_all (Display * d);
 
-static Display *start (char *);
 static void event_loop (Display *);
 static int *null_X_error (Display *, XErrorEvent *);
-static void reload_rc_file (void);
 static void catch_HUP_signal (int sig);
 static void catch_CHLD_signal (int sig);
 static void start_as_daemon (void);
@@ -169,7 +167,7 @@ main (int argc, char** argv)
 
 
 
-static Display *
+Display *
 start (char *display)
 {
   Display *d;
@@ -461,7 +459,7 @@ null_X_error (Display * d, XErrorEvent * e)
 
 
 
-static void
+void
 reload_rc_file (void)
 {
   int min, max;
