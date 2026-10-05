@@ -1128,10 +1128,14 @@ SCM run_command_wrapper (SCM command)
 
 SCM skippy_wrapper (SCM command)
 {
-  run_command_wrapper (command);
-  end_it_all (current_display);
-  start (display_name);
-  reload_rc_file ();
+  char *cmdstr;
+
+  cmdstr = scm_to_locale_string (command);
+
+  release_active_grabs ();
+  run_command (cmdstr);
+
+  free (cmdstr);
 
   return SCM_UNSPECIFIED;
 }

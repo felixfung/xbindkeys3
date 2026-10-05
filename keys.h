@@ -88,6 +88,8 @@ extern void modifier_to_string (unsigned int modifier, char *str);
 
 extern void run_command (char * command);
 
+extern void release_active_grabs (void);
+
 
 extern int nb_keys;
 extern Keys_t *keys;

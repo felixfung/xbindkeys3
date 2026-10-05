@@ -452,6 +452,18 @@ run_command (char *command)
 
 
 void
+release_active_grabs (void)
+{
+  /* Release current input capture, preserving passive shortcut registrations
+     and the display connection.  Complete the requests before launching a
+     command that may need to acquire its own grabs. */
+  XUngrabKeyboard (current_display, CurrentTime);
+  XUngrabPointer (current_display, CurrentTime);
+  XSync (current_display, False);
+}
+
+
+void
 start_command_key (Keys_t * key)
 {
   if (key->command == NULL)
@@ -465,11 +477,8 @@ start_command_key (Keys_t * key)
       return;
     }
 
-  run_command (key->command);
+  if (key->skippy)
+    release_active_grabs ();
 
-  if (key->skippy) {
-    end_it_all (current_display);
-    start (display_name);
-    reload_rc_file ();
-  }
+  run_command (key->command);
 }
